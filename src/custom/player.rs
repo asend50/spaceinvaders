@@ -33,7 +33,9 @@ impl Player {
     pub fn get_image(&self) -> &StillImage {
         &self.image
     }
-
+pub fn get_x(&self) -> f32 {
+    self.image.get_x()
+}
     pub fn keypress(&mut self) {
   
             // Direction to move in

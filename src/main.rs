@@ -6,6 +6,11 @@ Program Details: <Program Description Here>
 
 mod ui;
 mod utils;
+mod custom;
+mod menu;
+mod game;
+mod win;
+mod lose;
 
 use crate::ui::grid::draw_grid;
 use crate::ui::label::Label;
@@ -32,12 +37,27 @@ fn window_conf() -> Conf {
 
 #[macroquad::main(window_conf)]
 async fn main() {
-    
-    loop {
-        clear_background(WHITE);
-        draw_grid(50.0, BROWN);
-        
 
+    let mut tm = TextureManager::new();
+
+    tm.preload_with_loading_screen(&["assets/menu.png", "assets/player.png", "assets/enemy.png", "assets/bullet.png", "assets/gamebackground.png", "assets/gamebars.png"], None, None).await;
+
+    let mut score = 0;
+    
+    let mut current_screen = "menu".to_string();
+    let mut last_switch = get_time() - 0.02;
+
+    loop {
+        if get_time() - last_switch > 0.01 {
+            (current_screen, tm, score) = match current_screen.as_str() {
+                "menu" => menu::run(tm, score).await,
+                "game" => game::run(tm, score).await,
+                "win" => win::run(tm, score).await,
+                "lose" => lose::run(tm, score).await,
+                _ => break,
+            };
+            last_switch = get_time();
+        }
         next_frame().await;
     }
 }
