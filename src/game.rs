@@ -13,7 +13,7 @@ pub async fn run(tm: TextureManager, score: i32,) -> (String, TextureManager, i3
 
     let mut player = Player::new(
     500.0,                   // X position
-    500.0,                   // Y position
+    680.0,                   // Y position
     screen_width() * 0.07,  // Width
     screen_height() * 0.08, // Height
     "assets/player.png",    // Image name
@@ -21,17 +21,6 @@ pub async fn run(tm: TextureManager, score: i32,) -> (String, TextureManager, i3
     1.0,                    // Zoom level (100%)
     3.0,                    // Speed
     vec2(35.0, 15.0),       // Old position
-).await;
-
-let mut bullet = Bullet::new(
-    500.0,                   // X position
-    500.0,                   // Y position
-    screen_width() * 0.02,  // Width
-    screen_height() * 0.05, // Height
-    "assets/bullet.png",    // Image name
-    true,                   // Enable stretching
-    1.0,                    // Zoom level (100%)
-    3.0,                    // Speed
 ).await;
 
     let mut background= StillImage::from_preload(
@@ -54,14 +43,14 @@ let mut gamebars= StillImage::from_preload(
     1.0,                   // Zoom level (100%)
 );
 
-let mut bullets = vec![];
+let mut bullets: Vec<Bullet> = Vec::new();
+let mut shoot_cooldown = 0.0;
+
 
     loop {
         clear_background(WHITE);
         background.draw();
-        gamebars.draw();        
-        bullet.get_image().draw();
-        player.get_image().draw();
+        player.get_image().draw();     
 
 
         player.keypress();
@@ -74,17 +63,44 @@ let mut bullets = vec![];
             }
         }
 
-        if player.move_dir.y != 0.0 {
-            if check_collision(player.get_image(), &gamebars, 1) {
-                player.move_back_y();
-            }
-        }
+        let dt = get_frame_time();
+        shoot_cooldown -= dt;
 
-        if is_key_pressed(KeyCode::Space) {
-            bullets.push(1);
-            bullet.image.set_x(player.image.get_x() + 25.0);
-            bullet.image.set_y(player.image.get_y());
+         if is_key_down(KeyCode::Space) && shoot_cooldown <= 0.0 {
+        shoot_cooldown = 0.75;
+
+        let mut bullet = Bullet::new(
+            player.image.get_x() + 25.0,
+            player.image.get_y(),
+            screen_width() * 0.02,
+            screen_height() * 0.05,
+            "assets/bullet.png",
+            true,
+            1.0,
+            3.0,
+        ).await;
+
+        bullets.push(bullet);
+    }
+
+    for bullet in &mut bullets {
+        bullet.shoot();
+        bullet.get_image().draw();
+
+        if bullet.image.get_y() < -100.0 {
+            bullet.image.clear();
+            bullet.move_dir = vec2(0.0, 0.0);
         }
+    }
+
+    let mut last_shot = 0.0;
+
+if is_key_down(KeyCode::Space) && get_time() - last_shot > 1.0 {
+    last_shot = get_time();
+    // spawn bullet
+}
+
+    gamebars.draw();   
 
         next_frame().await;
     }

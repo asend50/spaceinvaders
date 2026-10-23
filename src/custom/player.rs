@@ -51,14 +51,6 @@ pub fn get_x(&self) -> f32 {
                 self.move_dir.x -= self.speed;
             }
 
-            if is_key_down(KeyCode::W) || is_key_down(KeyCode::Up) {
-                self.move_dir.y -= self.speed;
-            }
-
-            if is_key_down(KeyCode::S) || is_key_down(KeyCode::Down) {
-                self.move_dir.y += self.speed;
-            }
-
             if self.move_dir.length() > 0.0 {
                 self.move_dir = self.move_dir.normalize();
             }
@@ -67,28 +59,14 @@ pub fn get_x(&self) -> f32 {
 
     pub fn move_player(&mut self) {
         self.image.set_x(self.image.get_x() + self.move_dir.x);
-        self.image.set_y(self.image.get_y() + self.move_dir.y);
     }
 
     pub fn move_back_x(&mut self) {
         self.image.set_x(self.old_pos.x)
     }
 
-    pub fn move_back_y(&mut self) {
-        self.image.set_y(self.old_pos.y)
-    }
-
     pub fn get_speed(&self) -> f32 {
         self.speed
     }
 
-    pub fn move_to_start(&mut self) {
-        self.image.set_x(35.0);
-        self.image.set_y(15.0);
-    }
-
-    pub fn move_to_win(&mut self) {
-        self.image.set_x(930.0);
-        self.image.set_y(680.0);
-    }
 }

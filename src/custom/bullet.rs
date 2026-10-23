@@ -1,10 +1,12 @@
 use crate::ui::still_image::StillImage;
 use macroquad::prelude::*;
+use macroquad::input::KeyCode;
 
 pub struct Bullet {
     pub image: StillImage,
     pub speed: f32,
     pub move_dir: Vec2,
+  
 }
 impl Bullet {
     pub async fn new(
@@ -16,12 +18,13 @@ impl Bullet {
         stretch: bool,
         zoom: f32,
         speed: f32,
+
     ) -> Self {
         let image = StillImage::new(image_name, width, height, x, y, stretch, zoom).await;
 
         Bullet {
             image,
-            speed: 1.0,
+            speed,
             move_dir: vec2(0.0, 0.0),
         }
     }
@@ -31,19 +34,12 @@ impl Bullet {
     }
 
     pub fn shoot(&mut self) {
-  
-            // Direction to move in
-            self.move_dir = vec2(0.0, 0.0);         
-    
+            self.move_dir = vec2(0.0, -3.0);
 
-            if self.move_dir.length() > 0.0 {
-                self.move_dir = self.move_dir.normalize();
-            }
-    
-    }
-
-    pub fn get_speed(&self) -> f32 {
-        self.speed
+        if self.move_dir.length() > 0.0 {
+            self.image.set_y(self.image.get_y() + self.move_dir.y * self.speed * get_frame_time() * 60.0);
+        }
     }
    
 }
+
