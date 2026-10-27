@@ -5,7 +5,6 @@ pub struct Enemy {
     pub image: StillImage,
     pub speed: f32,
     pub move_dir: Vec2,
-    pub old_pos: Vec2,
 }
 impl Enemy {
     pub async fn new(
@@ -17,7 +16,6 @@ impl Enemy {
         stretch: bool,
         zoom: f32,
         speed: f32,
-        old_pos: Vec2,
     ) -> Self {
         let image = StillImage::new(image_name, width, height, x, y, stretch, zoom).await;
 
@@ -25,7 +23,6 @@ impl Enemy {
             image,
             speed: 1.0,
             move_dir: vec2(0.0, 0.0),
-            old_pos,
         }
     }
 
@@ -33,46 +30,15 @@ impl Enemy {
         &self.image
     }
 
-    pub fn keypress(&mut self) {
-  
-            // Direction to move in
-            self.move_dir = vec2(0.0, 0.0);
-            self.old_pos = vec2(self.image.get_x(), self.image.get_y());
+    pub fn enemymovement(&mut self) {
 
-            // Keyboard input
-            if is_key_down(KeyCode::D) || is_key_down(KeyCode::Right) {
-                self.move_dir.x += self.speed;
-            }
+        for _ in 0..25 {
+            self.image.set_x(self.image.get_x() + 2.0);
+        }
 
-            if is_key_down(KeyCode::A) || is_key_down(KeyCode::Left) {
-                self.move_dir.x -= self.speed;
-            }
-
-            if is_key_down(KeyCode::W) || is_key_down(KeyCode::Up) {
-                self.move_dir.y -= self.speed;
-            }
-
-            if is_key_down(KeyCode::S) || is_key_down(KeyCode::Down) {
-                self.move_dir.y += self.speed;
-            }
-
-            if self.move_dir.length() > 0.0 {
-                self.move_dir = self.move_dir.normalize();
-            }
-    
-    }
-
-    pub fn move_player(&mut self) {
-        self.image.set_x(self.image.get_x() + self.move_dir.x);
-        self.image.set_y(self.image.get_y() + self.move_dir.y);
-    }
-
-    pub fn move_back_x(&mut self) {
-        self.image.set_x(self.old_pos.x)
-    }
-
-    pub fn move_back_y(&mut self) {
-        self.image.set_y(self.old_pos.y)
+        for _ in 0..25 {
+            self.image.set_x(self.image.get_x() - 2.0);
+        }
     }
 
     pub fn get_speed(&self) -> f32 {
